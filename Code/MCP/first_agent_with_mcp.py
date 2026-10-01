@@ -22,11 +22,11 @@ THE KEY DIFFERENCE:
   └─────────────────────────────────────────────────┘
 
 Prerequisites:
-  pip install langchain langchain-openai langgraph
+  pip install langchain langchain-google-genai langgraph
   pip install langchain-mcp-adapters mcp python-dotenv
 
 Setup:
-  Create a .env file with: OPENAI_API_KEY=sk-your-key-here
+  Create a .env file with: GOOGLE_API_KEY=your-gemini-key-here
 
   Make sure mcp_math_server.py is in the same directory.
 
@@ -45,19 +45,16 @@ load_dotenv()
 # ─────────────────────────────────────────────
 # STEP 1: Initialize the Model
 # ─────────────────────────────────────────────
-# ✅ SAME AS BEFORE — the model doesn't change.
 # MCP only changes WHERE tools come from,
 # not how the LLM reasons about them.
 
-from langchain.chat_models import init_chat_model
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 
-# Change this line:
-# model = init_chat_model("openai:gpt-4o-mini")
-
-# To this:
-#model = init_chat_model("openai:gpt-4o-mini").bind(parallel_tool_calls=False)
-model = ChatOpenAI(model="gpt-5.5", parallel_tool_calls=False)
+model = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    google_api_key=os.getenv("GOOGLE_API_KEY"),
+    temperature=0,
+)
 
 
 # ─────────────────────────────────────────────
@@ -163,18 +160,6 @@ async def main():
     # ✅ SAME AS BEFORE — the agent creation is identical!
     # The agent doesn't know or care that tools came from MCP.
     # It just sees LangChain tools and uses them normally.
-    #
-    # ⚠️ IMPORTANT: parallel_tool_calls=False
-    #
-    # By default, newer OpenAI models (GPT-4o, GPT-4o-mini)
-    # try to call multiple tools at the same time (in parallel)
-    # to be faster. This causes WRONG ANSWERS for sequential
-    # math like "15 × 8, then ÷ 3" because the LLM calls
-    # multiply(15,8) AND divide(15,3) simultaneously instead
-    # of waiting for the multiply result first.
-    #
-    # Setting parallel_tool_calls=False forces the LLM to
-    # call tools one at a time, in the correct order.
 
     agent = create_agent(
         model,

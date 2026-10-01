@@ -54,8 +54,8 @@ CSV in Excel beside it, and the numbers should line up to the cent.
 
 PREREQUISITES
 -------------
-    pip install mcp langchain langchain-openai langchain-mcp-adapters langgraph
-    set OPENAI_API_KEY=<your-key>
+    pip install mcp langchain langchain-google-genai langchain-mcp-adapters langgraph
+    set GOOGLE_API_KEY=<your-key>
 
 OCI auth: this course uses API keys, not session tokens. If you haven't
 already set up OCI, run:
@@ -82,7 +82,7 @@ from pathlib import Path
 from langchain.agents import create_agent
 from langchain_core.messages import ToolMessage
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -98,7 +98,7 @@ env_path = script_dir / ".env"
 
 load_dotenv(dotenv_path=env_path)
 
-print("OPENAI_API_KEY found:", bool(os.getenv("OPENAI_API_KEY")))
+print("GOOGLE_API_KEY found:", bool(os.getenv("GOOGLE_API_KEY")))
 
 # ----------------------------------------------------------------------
 # OCI config helper.
@@ -295,7 +295,11 @@ async def main() -> None:
     # deterministic. The system prompt teaches the LLM the argument
     # contract and explicitly forbids it from rendering tables itself.
     # ------------------------------------------------------------------
-    llm = ChatOpenAI(model="gpt-5.5", parallel_tool_calls=False)
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash",
+        google_api_key=os.getenv("GOOGLE_API_KEY"),
+        temperature=0,
+    )
 
     agent = create_agent(
         model=llm,

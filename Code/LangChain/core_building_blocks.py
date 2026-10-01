@@ -10,10 +10,10 @@ Demo order (matches the lessons):
   Lesson 2 → Tools
 
 Prerequisites:
-  pip install langchain langchain-openai python-dotenv
+  pip install langchain langchain-google-genai python-dotenv
 
 Setup:
-  Create a .env file with: OPENAI_API_KEY=sk-your-key-here
+  Create a .env file with: GOOGLE_API_KEY=your-gemini-key-here
 ==========================================================
 """
 #
@@ -37,20 +37,21 @@ env_path = script_dir / ".env"
 load_dotenv(dotenv_path=env_path)
 
 # Quick sanity check that the key actually loaded before we call the model.
-print("OPENAI_API_KEY found:", bool(os.getenv("OPENAI_API_KEY")))
+print("GOOGLE_API_KEY found:", bool(os.getenv("GOOGLE_API_KEY")))
 
 # ─────────────────────────────────────────────
 # 1. MODELS — The Reasoning Engine
 # ─────────────────────────────────────────────
 # The "model" is the LLM itself — the part that actually thinks.
-# init_chat_model gives ONE interface to every provider: to switch from
-# OpenAI to Anthropic or Google, you change only the string below.
+# We use the Google Gemini integration directly for a simple, consistent API.
 
-from langchain.chat_models import init_chat_model
+from langchain_google_genai import ChatGoogleGenerativeAI
 
-model = init_chat_model("openai:gpt-5.5")
-# model = init_chat_model("anthropic:claude-3-5-sonnet-latest")
-# model = init_chat_model("google_genai:gemini-2.0-flash")
+model = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    google_api_key=os.getenv("GOOGLE_API_KEY"),
+    temperature=0,
+)
 
 # The simplest possible use: send text in, get an answer back.
 # .invoke() is the universal "run it" method across LangChain.

@@ -8,11 +8,11 @@ This program demonstrates:
 - How to build an agent using LangChain's create_agent()
 
 Prerequisites:
-  pip install langchain langchain-openai langgraph python-dotenv
+  pip install langchain langchain-google-genai langgraph python-dotenv
 
 Setup:
   Create a .env file with:
-  OPENAI_API_KEY=sk-your-key-here
+  GOOGLE_API_KEY=your-gemini-key-here
 ==========================================================
 """
 
@@ -25,7 +25,7 @@ Setup:
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # Loads variables like OPENAI_API_KEY into environment
+load_dotenv()  # Loads variables like GOOGLE_API_KEY into environment
 
 
 # -------------------------------------------------------
@@ -36,10 +36,13 @@ load_dotenv()  # Loads variables like OPENAI_API_KEY into environment
 # - Decide which tool to use
 # - Generate the final answer
 
-from langchain.chat_models import init_chat_model
+from langchain_google_genai import ChatGoogleGenerativeAI
 
-# "gpt-5.5" is the latest model
-model = init_chat_model("openai:gpt-5.5")
+model = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    google_api_key=os.getenv("GOOGLE_API_KEY"),
+    temperature=0,
+)
 
 
 # -------------------------------------------------------
